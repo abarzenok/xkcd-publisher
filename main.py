@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 from pprint import pprint # debug only
 
+
 def main():
     load_dotenv()
 
