@@ -12,7 +12,8 @@ def main():
     vk_api_url = 'https://api.vk.com/method/'
     vk_api_version = 5.131
     vk_access_token = os.getenv('VK_API_ACCESS_TOKEN')
-
+    vk_group_id = os.getenv('VK_GROUP_ID')
+    vk_user_id = os.getenv('VK_USER_ID')
     images_folder = 'images'
     Path(images_folder).mkdir(exist_ok=True)
 
@@ -34,8 +35,7 @@ def main():
         file_name
     )
 
-    alt = response.json()['alt'] # rename
-    print(alt)
+    comics_alternative_text = response.json()['alt'] # rename
 
     params = {
         'access_token': vk_access_token,
@@ -46,36 +46,30 @@ def main():
         params=params
     )
     vk_response.raise_for_status()
-    pprint(vk_response.json())
 
-    params['group_id'] = 210688801
+    params['group_id'] = vk_group_id
 
     vk_response = requests.get(
         f'{vk_api_url}/photos.getWallUploadServer',
         params=params
     )
     vk_response.raise_for_status()
-    pprint(vk_response.json())
     upload_url = vk_response.json()['response']['upload_url']
-    print(upload_url)
 
     data = {
         'access_token': vk_access_token,
         'v': vk_api_version,
     }
     with open(f'{images_folder}/{file_name}', 'rb') as photo:
-
         files = {
             'photo': photo,
         }
-
         vk_response = requests.post(
             upload_url,
             data=data,
             files=files,
         )
-        vk_response.raise_for_status()
-        pprint(vk_response.json())
+    vk_response.raise_for_status()
     params['photo'] = vk_response.json()['photo']
     params['server'] = vk_response.json()['server']
     params['hash'] = vk_response.json()['hash']
@@ -87,17 +81,16 @@ def main():
         data=params
     )
     vk_response.raise_for_status()
-    pprint(vk_response.json())
 
     image_id = vk_response.json()['response'][0]['id']
 
     data = {
         'access_token': vk_access_token,
         'v': vk_api_version,
-        'owner_id': -210688801,
+        'owner_id': -int(vk_group_id),
         'from_group': 1,
-        'attachments': f'photo6166300_{image_id}',
-        'message': alt,
+        'attachments': f'photo{vk_user_id}_{image_id}',
+        'message': comics_alternative_text,
     }
     vk_response = requests.post(
         f'{vk_api_url}/wall.post',
