@@ -35,7 +35,7 @@ def main():
         file_name
     )
 
-    comics_alternative_text = response.json()['alt'] # rename
+    comics_alternative_text = response.json()['alt']
 
     params = {
         'access_token': vk_access_token,
