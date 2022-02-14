@@ -17,38 +17,29 @@ def main():
     images_folder = 'images'
     Path(images_folder).mkdir(exist_ok=True)
 
-    response = requests.get('https://xkcd.com/info.0.json')
-    response.raise_for_status()
-    total_comics = response.json()['num']
+    last_comic = requests.get('https://xkcd.com/info.0.json')
+    last_comic.raise_for_status()
+    total_comics = last_comic.json()['num']
     random_comic_number = random.randint(1, total_comics)
 
-    response = requests.get(f'https://xkcd.com/{random_comic_number}/info.0.json')
-    response.raise_for_status()
+    random_comic = requests.get(f'https://xkcd.com/{random_comic_number}/info.0.json')
+    random_comic.raise_for_status()
+    comic_alternative_text = random_comic.json()['alt']
     file_name = '{}{}'.format(
-        response.json()['safe_title'],
-        get_file_extension_from_url(response.json()['img'])
+        random_comic.json()['safe_title'],
+        get_file_extension_from_url(random_comic.json()['img'])
     )
-
     download_image(
-        response.json()['img'],
+        random_comic.json()['img'],
         images_folder,
         file_name
     )
 
-    comics_alternative_text = response.json()['alt']
-
     params = {
         'access_token': vk_access_token,
         'v': vk_api_version,
+        'group_id': vk_group_id,
     }
-    vk_response = requests.get(
-        f'{vk_api_url}/groups.get',
-        params=params
-    )
-    vk_response.raise_for_status()
-
-    params['group_id'] = vk_group_id
-
     vk_response = requests.get(
         f'{vk_api_url}/photos.getWallUploadServer',
         params=params
@@ -70,6 +61,7 @@ def main():
             files=files,
         )
     vk_response.raise_for_status()
+
     params['photo'] = vk_response.json()['photo']
     params['server'] = vk_response.json()['server']
     params['hash'] = vk_response.json()['hash']
@@ -87,10 +79,10 @@ def main():
     data = {
         'access_token': vk_access_token,
         'v': vk_api_version,
-        'owner_id': -int(vk_group_id),
+        'owner_id': f'-{vk_group_id}',
         'from_group': 1,
         'attachments': f'photo{vk_user_id}_{image_id}',
-        'message': comics_alternative_text,
+        'message': comic_alternative_text,
     }
     vk_response = requests.post(
         f'{vk_api_url}/wall.post',
