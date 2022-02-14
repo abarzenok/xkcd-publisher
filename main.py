@@ -9,6 +9,9 @@ from pprint import pprint # debug only
 
 def main():
     load_dotenv()
+    vk_api_url = 'https://api.vk.com/method/'
+    vk_api_version = 5.131
+    vk_access_token = os.getenv('VK_API_ACCESS_TOKEN')
 
     images_folder = 'images'
     Path(images_folder).mkdir(exist_ok=True)
@@ -35,11 +38,11 @@ def main():
     print(alt)
 
     params = {
-        'access_token': os.getenv('VK_API_ACCESS_TOKEN'),
-        'v': 5.131,
+        'access_token': vk_access_token,
+        'v': vk_api_version,
     }
     vk_response = requests.get(
-        'https://api.vk.com/method/groups.get',
+        f'{vk_api_url}/groups.get',
         params=params
     )
     vk_response.raise_for_status()
@@ -48,7 +51,7 @@ def main():
     params['group_id'] = 210688801
 
     vk_response = requests.get(
-        'https://api.vk.com/method/photos.getWallUploadServer',
+        f'{vk_api_url}/photos.getWallUploadServer',
         params=params
     )
     vk_response.raise_for_status()
@@ -57,8 +60,8 @@ def main():
     print(upload_url)
 
     data = {
-        'access_token': os.getenv('VK_API_ACCESS_TOKEN'),
-        'v': 5.131,
+        'access_token': vk_access_token,
+        'v': vk_api_version,
     }
     with open(f'{images_folder}/{file_name}', 'rb') as photo:
 
@@ -80,7 +83,7 @@ def main():
     os.remove(f'{images_folder}/{file_name}')
 
     vk_response = requests.post(
-        'https://api.vk.com/method/photos.saveWallPhoto',
+        f'{vk_api_url}/photos.saveWallPhoto',
         data=params
     )
     vk_response.raise_for_status()
@@ -89,15 +92,15 @@ def main():
     image_id = vk_response.json()['response'][0]['id']
 
     data = {
-        'access_token': os.getenv('VK_API_ACCESS_TOKEN'),
-        'v': 5.131,
+        'access_token': vk_access_token,
+        'v': vk_api_version,
         'owner_id': -210688801,
         'from_group': 1,
         'attachments': f'photo6166300_{image_id}',
         'message': alt,
     }
     vk_response = requests.post(
-        'https://api.vk.com/method/wall.post',
+        f'{vk_api_url}/wall.post',
         data=data
     )
     vk_response.raise_for_status()
