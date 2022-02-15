@@ -21,7 +21,9 @@ def main():
     total_comics = last_comic.json()['num']
     random_comic_number = random.randint(1, total_comics)
 
-    random_comic = requests.get(f'https://xkcd.com/{random_comic_number}/info.0.json')
+    random_comic = requests.get(
+        f'https://xkcd.com/{random_comic_number}/info.0.json'
+    )
     random_comic.raise_for_status()
     comic_alternative_text = random_comic.json()['alt']
     file_name = '{}{}'.format(
