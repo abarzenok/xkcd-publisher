@@ -40,12 +40,12 @@ def main():
         'v': vk_api_version,
         'group_id': vk_group_id,
     }
-    vk_response = requests.get(
+    upload_server = requests.get(
         f'{vk_api_url}/photos.getWallUploadServer',
         params=params
     )
-    vk_response.raise_for_status()
-    upload_url = vk_response.json()['response']['upload_url']
+    upload_server.raise_for_status()
+    upload_url = upload_server.json()['response']['upload_url']
 
     data = {
         'access_token': vk_access_token,
@@ -55,26 +55,28 @@ def main():
         files = {
             'photo': photo,
         }
-        vk_response = requests.post(
+        uploaded_photo = requests.post(
             upload_url,
             data=data,
             files=files,
         )
-    vk_response.raise_for_status()
-
-    params['photo'] = vk_response.json()['photo']
-    params['server'] = vk_response.json()['server']
-    params['hash'] = vk_response.json()['hash']
-
+    uploaded_photo.raise_for_status()
     os.remove(f'{images_folder}/{file_name}')
 
-    vk_response = requests.post(
+    data = {
+        'access_token': vk_access_token,
+        'v': vk_api_version,
+        'group_id': vk_group_id,
+        'photo': uploaded_photo.json()['photo'],
+        'server': uploaded_photo.json()['server'],
+        'hash': uploaded_photo.json()['hash'],
+    }
+    saved_photo = requests.post(
         f'{vk_api_url}/photos.saveWallPhoto',
-        data=params
+        data=data
     )
-    vk_response.raise_for_status()
-
-    image_id = vk_response.json()['response'][0]['id']
+    saved_photo.raise_for_status()
+    image_id = saved_photo.json()['response'][0]['id']
 
     data = {
         'access_token': vk_access_token,
@@ -84,12 +86,12 @@ def main():
         'attachments': f'photo{vk_user_id}_{image_id}',
         'message': comic_alternative_text,
     }
-    vk_response = requests.post(
+    wall_post = requests.post(
         f'{vk_api_url}/wall.post',
         data=data
     )
-    vk_response.raise_for_status()
-    pprint(vk_response.json())
+    wall_post.raise_for_status()
+    pprint(wall_post.json())
 
 
 if __name__ == '__main__':
