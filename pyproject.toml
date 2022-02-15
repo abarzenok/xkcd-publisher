@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "xkcd-publisher"
 version = "0.1.0"
-description = ""
+description = "Posts random xkcd comic to a VK group"
 authors = ["abarzenok <69277070+abarzenok@users.noreply.github.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
 requests = "^2.27.1"
-pylint = "^2.12.2"
+python-dotenv = "^0.19.2"
 
 [tool.poetry.dev-dependencies]
 
