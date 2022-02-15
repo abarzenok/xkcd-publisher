@@ -4,7 +4,6 @@ import requests
 from download_utils import download_image, get_file_extension_from_url
 from dotenv import load_dotenv
 from pathlib import Path
-from pprint import pprint # debug only
 
 
 def main():
@@ -91,7 +90,6 @@ def main():
         data=data
     )
     wall_post.raise_for_status()
-    pprint(wall_post.json())
 
 
 if __name__ == '__main__':
