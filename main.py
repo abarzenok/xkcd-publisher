@@ -7,6 +7,18 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 
+def get_random_xkcd_comic():
+    last_comic = requests.get('https://xkcd.com/info.0.json')
+    last_comic.raise_for_status()
+    total_comics = last_comic.json()['num']
+    random_comic_number = random.randint(1, total_comics)
+    random_comic = requests.get(
+        f'https://xkcd.com/{random_comic_number}/info.0.json'
+    )
+    random_comic.raise_for_status()
+    return random_comic.json()
+
+
 def main():
     load_dotenv()
     vk_api_url = 'https://api.vk.com/method/'
@@ -17,23 +29,14 @@ def main():
     images_folder = 'images'
     Path(images_folder).mkdir(exist_ok=True)
 
-    last_comic = requests.get('https://xkcd.com/info.0.json')
-    last_comic.raise_for_status()
-    total_comics = last_comic.json()['num']
-    random_comic_number = random.randint(1, total_comics)
-
-    random_comic = requests.get(
-        f'https://xkcd.com/{random_comic_number}/info.0.json'
-    )
-    random_comic.raise_for_status()
-    random_comic_body = random_comic.json()
-    comic_alternative_text = random_comic_body['alt']
+    xkcd_comic = get_random_xkcd_comic()
+    comic_alternative_text = xkcd_comic['alt']
     file_name = '{}{}'.format(
-        random_comic_body['safe_title'],
-        get_file_extension_from_url(random_comic_body['img'])
+        xkcd_comic['safe_title'],
+        get_file_extension_from_url(xkcd_comic['img'])
     )
     download_image(
-        random_comic_body['img'],
+        xkcd_comic['img'],
         images_folder,
         file_name
     )
