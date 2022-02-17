@@ -12,12 +12,14 @@ Posts a random [xkcd](https://xkcd.com) comic to the [VK](https://vk.com) group.
 VK_USER_ID=<paste account id here>
 ```
 Account ID can be obtained at [regvk](https://regvk.com/id/) (note: the site is in Russian only).
+
 3. You will also need a group in which you want to post your comics (you must have admin rights to this group). You can see the available groups on a dedicated page: [vk.com/groups?tab=admin](https://vk.com/groups?tab=admin).
 Save your group ID in the `.env`:
 ```commandline
 VK_GROUP_ID=<paste group id here>
 ```
 Group ID can be obtained at [regvk](https://regvk.com/id/) (note: the site is in Russian only).
+
 4. You will need an application through which you will publish comics. You can create it here: [vk.com/apps?act=manage](https://vk.com/apps?act=manage). Select the `Standalone app` platform. In the `Settings` tab of the application, see `App ID`. You will need it in the next step.
 5. Get access token via [VK implicit flow](https://vk.com/dev/implicit_flow_user).
 Paste the `App ID` obtained in the previous step as `client_id`:
