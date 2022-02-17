@@ -26,13 +26,14 @@ def main():
         f'https://xkcd.com/{random_comic_number}/info.0.json'
     )
     random_comic.raise_for_status()
-    comic_alternative_text = random_comic.json()['alt']
+    random_comic_body = random_comic.json()
+    comic_alternative_text = random_comic_body['alt']
     file_name = '{}{}'.format(
-        random_comic.json()['safe_title'],
-        get_file_extension_from_url(random_comic.json()['img'])
+        random_comic_body['safe_title'],
+        get_file_extension_from_url(random_comic_body['img'])
     )
     download_image(
-        random_comic.json()['img'],
+        random_comic_body['img'],
         images_folder,
         file_name
     )
@@ -64,6 +65,7 @@ def main():
             files=files,
         )
     uploaded_photo.raise_for_status()
+    uploaded_photo_body = uploaded_photo.json()
     check_vk_error(uploaded_photo)
     os.remove(f'{images_folder}/{file_name}')
 
@@ -71,9 +73,9 @@ def main():
         'access_token': vk_access_token,
         'v': vk_api_version,
         'group_id': vk_group_id,
-        'photo': uploaded_photo.json()['photo'],
-        'server': uploaded_photo.json()['server'],
-        'hash': uploaded_photo.json()['hash'],
+        'photo': uploaded_photo_body['photo'],
+        'server': uploaded_photo_body['server'],
+        'hash': uploaded_photo_body['hash'],
     }
     saved_photo = requests.post(
         f'{vk_api_url}/photos.saveWallPhoto',
