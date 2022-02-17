@@ -8,9 +8,10 @@ from download_utils import (
     get_file_extension_from_url
 )
 from vk_utils import (
-    check_vk_error,
     get_vk_photo_upload_url,
-    upload_photo_to_vk
+    upload_photo_to_vk,
+    save_vk_wall_photo,
+    post_to_vk_wall
 )
 
 
@@ -65,36 +66,23 @@ def main():
 
     os.remove(f'{images_folder}/{file_name}')
 
-    data = {
-        'access_token': vk_access_token,
-        'v': vk_api_version,
-        'group_id': vk_group_id,
-        'photo': uploaded_photo_body['photo'],
-        'server': uploaded_photo_body['server'],
-        'hash': uploaded_photo_body['hash'],
-    }
-    saved_photo = requests.post(
-        f'{vk_api_url}/photos.saveWallPhoto',
-        data=data
-    )
-    saved_photo.raise_for_status()
-    check_vk_error(saved_photo)
-    image_id = saved_photo.json()['response'][0]['id']
+    image_id = save_vk_wall_photo(
+        vk_access_token,
+        vk_api_version,
+        vk_group_id,
+        uploaded_photo_body['photo'],
+        uploaded_photo_body['server'],
+        uploaded_photo_body['hash']
+    )['response'][0]['id']
 
-    data = {
-        'access_token': vk_access_token,
-        'v': vk_api_version,
-        'owner_id': f'-{vk_group_id}',
-        'from_group': 1,
-        'attachments': f'photo{vk_user_id}_{image_id}',
-        'message': comic_alternative_text,
-    }
-    wall_post = requests.post(
-        f'{vk_api_url}/wall.post',
-        data=data
+    post_to_vk_wall(
+        vk_access_token,
+        vk_api_version,
+        vk_group_id,
+        vk_user_id,
+        image_id,
+        comic_alternative_text
     )
-    wall_post.raise_for_status()
-    check_vk_error(wall_post)
 
 
 if __name__ == '__main__':

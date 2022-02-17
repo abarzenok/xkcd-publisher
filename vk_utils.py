@@ -39,14 +39,14 @@ def get_vk_photo_upload_url(
     )
     upload_server.raise_for_status()
     check_vk_error(upload_server)
-    return upload_server.json().get['response']['upload_url']
+    return upload_server.json()['response']['upload_url']
 
 
 def upload_photo_to_vk(
-    access_token,
-    api_version,
-    upload_url,
-    photo
+        access_token,
+        api_version,
+        upload_url,
+        photo
 ):
     data = {
         'access_token': access_token,
@@ -63,3 +63,53 @@ def upload_photo_to_vk(
     uploaded_photo.raise_for_status()
     check_vk_error(uploaded_photo)
     return uploaded_photo.json()
+
+
+def save_vk_wall_photo(
+        access_token,
+        api_version,
+        group_id,
+        vk_photo,
+        vk_server,
+        vk_photo_hash
+):
+    data = {
+        'access_token': access_token,
+        'v': api_version,
+        'group_id': group_id,
+        'photo': vk_photo,
+        'server': vk_server,
+        'hash': vk_photo_hash,
+    }
+    saved_photo = requests.post(
+        f'{VK_API_URL}/photos.saveWallPhoto',
+        data=data
+    )
+    saved_photo.raise_for_status()
+    check_vk_error(saved_photo)
+    return saved_photo.json()
+
+
+def post_to_vk_wall(
+        access_token,
+        api_version,
+        vk_group_id,
+        vk_user_id,
+        image_id,
+        post_text
+):
+    data = {
+        'access_token': access_token,
+        'v': api_version,
+        'owner_id': f'-{vk_group_id}',
+        'from_group': 1,
+        'attachments': f'photo{vk_user_id}_{image_id}',
+        'message': post_text,
+    }
+    wall_post = requests.post(
+        f'{VK_API_URL}/wall.post',
+        data=data
+    )
+    wall_post.raise_for_status()
+    check_vk_error(wall_post)
+    return wall_post.json()
