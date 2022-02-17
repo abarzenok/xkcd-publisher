@@ -40,3 +40,26 @@ def get_vk_photo_upload_url(
     upload_server.raise_for_status()
     check_vk_error(upload_server)
     return upload_server.json().get['response']['upload_url']
+
+
+def upload_photo_to_vk(
+    access_token,
+    api_version,
+    upload_url,
+    photo
+):
+    data = {
+        'access_token': access_token,
+        'v': api_version,
+    }
+    files = {
+        'photo': photo,
+    }
+    uploaded_photo = requests.post(
+        upload_url,
+        data=data,
+        files=files,
+    )
+    uploaded_photo.raise_for_status()
+    check_vk_error(uploaded_photo)
+    return uploaded_photo.json()

@@ -1,7 +1,6 @@
 import os
 import random
 import requests
-
 from dotenv import load_dotenv
 from pathlib import Path
 from download_utils import (
@@ -11,6 +10,7 @@ from download_utils import (
 from vk_utils import (
     check_vk_error,
     get_vk_photo_upload_url,
+    upload_photo_to_vk
 )
 
 
@@ -55,22 +55,14 @@ def main():
         vk_group_id
     )
 
-    data = {
-        'access_token': vk_access_token,
-        'v': vk_api_version,
-    }
     with open(f'{images_folder}/{file_name}', 'rb') as photo:
-        files = {
-            'photo': photo,
-        }
-        uploaded_photo = requests.post(
+        uploaded_photo_body = upload_photo_to_vk(
+            vk_access_token,
+            vk_api_version,
             upload_url,
-            data=data,
-            files=files,
+            photo
         )
-    uploaded_photo.raise_for_status()
-    uploaded_photo_body = uploaded_photo.json()
-    check_vk_error(uploaded_photo)
+
     os.remove(f'{images_folder}/{file_name}')
 
     data = {
