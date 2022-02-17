@@ -44,27 +44,27 @@ def main():
         xkcd_comic['safe_title'],
         get_file_extension_from_url(xkcd_comic['img'])
     )
-    download_image(
-        xkcd_comic['img'],
-        images_folder,
-        file_name
-    )
-
-    upload_url = get_vk_photo_upload_url(
-        vk_access_token,
-        vk_api_version,
-        vk_group_id
-    )
-
-    with open(f'{images_folder}/{file_name}', 'rb') as photo:
-        uploaded_photo_body = upload_photo_to_vk(
+    try:
+        download_image(
+            xkcd_comic['img'],
+            images_folder,
+            file_name
+        )
+        upload_url = get_vk_photo_upload_url(
             vk_access_token,
             vk_api_version,
-            upload_url,
-            photo
+            vk_group_id
         )
 
-    os.remove(f'{images_folder}/{file_name}')
+        with open(f'{images_folder}/{file_name}', 'rb') as photo:
+            uploaded_photo_body = upload_photo_to_vk(
+                vk_access_token,
+                vk_api_version,
+                upload_url,
+                photo
+            )
+    finally:
+        os.remove(f'{images_folder}/{file_name}')
 
     image_id = save_vk_wall_photo(
         vk_access_token,
