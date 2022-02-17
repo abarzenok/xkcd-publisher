@@ -2,6 +2,7 @@ import os
 import random
 import requests
 from download_utils import download_image, get_file_extension_from_url
+from vk_utils import check_vk_error
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -46,6 +47,7 @@ def main():
         params=params
     )
     upload_server.raise_for_status()
+    check_vk_error(upload_server)
     upload_url = upload_server.json()['response']['upload_url']
 
     data = {
@@ -62,6 +64,7 @@ def main():
             files=files,
         )
     uploaded_photo.raise_for_status()
+    check_vk_error(uploaded_photo)
     os.remove(f'{images_folder}/{file_name}')
 
     data = {
@@ -77,6 +80,7 @@ def main():
         data=data
     )
     saved_photo.raise_for_status()
+    check_vk_error(saved_photo)
     image_id = saved_photo.json()['response'][0]['id']
 
     data = {
@@ -92,6 +96,7 @@ def main():
         data=data
     )
     wall_post.raise_for_status()
+    check_vk_error(wall_post)
 
 
 if __name__ == '__main__':
