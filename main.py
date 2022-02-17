@@ -1,10 +1,17 @@
 import os
 import random
 import requests
-from download_utils import download_image, get_file_extension_from_url
-from vk_utils import check_vk_error
+
 from dotenv import load_dotenv
 from pathlib import Path
+from download_utils import (
+    download_image,
+    get_file_extension_from_url
+)
+from vk_utils import (
+    check_vk_error,
+    get_vk_photo_upload_url,
+)
 
 
 def get_random_xkcd_comic():
@@ -21,11 +28,12 @@ def get_random_xkcd_comic():
 
 def main():
     load_dotenv()
-    vk_api_url = 'https://api.vk.com/method/'
+
     vk_api_version = 5.131
     vk_access_token = os.getenv('VK_API_ACCESS_TOKEN')
     vk_group_id = os.getenv('VK_GROUP_ID')
     vk_user_id = os.getenv('VK_USER_ID')
+
     images_folder = 'images'
     Path(images_folder).mkdir(exist_ok=True)
 
@@ -41,18 +49,11 @@ def main():
         file_name
     )
 
-    params = {
-        'access_token': vk_access_token,
-        'v': vk_api_version,
-        'group_id': vk_group_id,
-    }
-    upload_server = requests.get(
-        f'{vk_api_url}/photos.getWallUploadServer',
-        params=params
+    upload_url = get_vk_photo_upload_url(
+        vk_access_token,
+        vk_api_version,
+        vk_group_id
     )
-    upload_server.raise_for_status()
-    check_vk_error(upload_server)
-    upload_url = upload_server.json()['response']['upload_url']
 
     data = {
         'access_token': vk_access_token,
