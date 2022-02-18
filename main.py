@@ -65,7 +65,6 @@ def main():
                 upload_url,
                 photo
             )
-
         image_id = save_vk_wall_photo(
             vk_access_token,
             vk_api_version,
@@ -83,10 +82,18 @@ def main():
             image_id,
             comic_alternative_text
         )
-    except VKError:
-        pass
-    except HTTPError:
-        pass
+    except VKError as vk_err:
+        print(
+            'VK returned an error.',
+            vk_err.__str__(),
+            sep='\n'
+        )
+    except HTTPError as http_err:
+        print(
+            'HTTP error occurred.',
+            http_err.__str__(),
+            sep='\n'
+        )
     finally:
         os.remove(f'{images_folder}/{file_name}')
 
