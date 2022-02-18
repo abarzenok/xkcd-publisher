@@ -38,15 +38,16 @@ def main():
     vk_user_id = os.getenv('VK_USER_ID')
 
     images_folder = 'images'
+    file_name = None
     Path(images_folder).mkdir(exist_ok=True)
 
-    xkcd_comic = get_random_xkcd_comic()
-    comic_alternative_text = xkcd_comic['alt']
-    file_name = '{}{}'.format(
-        xkcd_comic['safe_title'],
-        get_file_extension_from_url(xkcd_comic['img'])
-    )
     try:
+        xkcd_comic = get_random_xkcd_comic()
+        comic_alternative_text = xkcd_comic['alt']
+        file_name = '{}{}'.format(
+            xkcd_comic['safe_title'],
+            get_file_extension_from_url(xkcd_comic['img'])
+        )
         download_image(
             xkcd_comic['img'],
             images_folder,
@@ -95,7 +96,7 @@ def main():
             sep='\n'
         )
     finally:
-        os.remove(f'{images_folder}/{file_name}')
+        Path(f'{images_folder}/{file_name}').unlink(missing_ok=True)
 
 
 if __name__ == '__main__':
