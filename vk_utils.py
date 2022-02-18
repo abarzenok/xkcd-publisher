@@ -14,8 +14,7 @@ class VKError(Exception):
                f'Error message: {self.message}'
 
 
-def check_vk_error(response):
-    response_body = response.json()
+def check_vk_error(response_body):
     if response_body.get('error'):
         raise VKError(
             response_body.get('error').get('error_code'),
@@ -38,8 +37,9 @@ def get_vk_photo_upload_url(
         params=params
     )
     upload_server.raise_for_status()
-    check_vk_error(upload_server)
-    return upload_server.json()['response']['upload_url']
+    upload_server_body = upload_server.json()
+    check_vk_error(upload_server_body)
+    return upload_server_body['response']['upload_url']
 
 
 def upload_photo_to_vk(
@@ -61,8 +61,9 @@ def upload_photo_to_vk(
         files=files,
     )
     uploaded_photo.raise_for_status()
-    check_vk_error(uploaded_photo)
-    return uploaded_photo.json()
+    uploaded_photo_body = uploaded_photo.json()
+    check_vk_error(uploaded_photo_body)
+    return uploaded_photo_body
 
 
 def save_vk_wall_photo(
@@ -86,8 +87,9 @@ def save_vk_wall_photo(
         data=data
     )
     saved_photo.raise_for_status()
-    check_vk_error(saved_photo)
-    return saved_photo.json()
+    saved_photo_body = saved_photo.json()
+    check_vk_error(saved_photo_body)
+    return saved_photo_body
 
 
 def post_to_vk_wall(
@@ -111,5 +113,6 @@ def post_to_vk_wall(
         data=data
     )
     wall_post.raise_for_status()
-    check_vk_error(wall_post)
-    return wall_post.json()
+    wall_post_body = wall_post.json()
+    check_vk_error(wall_post_body)
+    return wall_post_body
