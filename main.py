@@ -3,15 +3,17 @@ import random
 import requests
 from dotenv import load_dotenv
 from pathlib import Path
+from requests import HTTPError
 from download_utils import (
     download_image,
-    get_file_extension_from_url
+    get_file_extension_from_url,
 )
 from vk_utils import (
+    VKError,
     get_vk_photo_upload_url,
     upload_photo_to_vk,
     save_vk_wall_photo,
-    post_to_vk_wall
+    post_to_vk_wall,
 )
 
 
@@ -63,26 +65,30 @@ def main():
                 upload_url,
                 photo
             )
+
+        image_id = save_vk_wall_photo(
+            vk_access_token,
+            vk_api_version,
+            vk_group_id,
+            uploaded_photo_body['photo'],
+            uploaded_photo_body['server'],
+            uploaded_photo_body['hash']
+        )['response'][0]['id']
+
+        post_to_vk_wall(
+            vk_access_token,
+            vk_api_version,
+            vk_group_id,
+            vk_user_id,
+            image_id,
+            comic_alternative_text
+        )
+    except VKError:
+        pass
+    except HTTPError:
+        pass
     finally:
         os.remove(f'{images_folder}/{file_name}')
-
-    image_id = save_vk_wall_photo(
-        vk_access_token,
-        vk_api_version,
-        vk_group_id,
-        uploaded_photo_body['photo'],
-        uploaded_photo_body['server'],
-        uploaded_photo_body['hash']
-    )['response'][0]['id']
-
-    post_to_vk_wall(
-        vk_access_token,
-        vk_api_version,
-        vk_group_id,
-        vk_user_id,
-        image_id,
-        comic_alternative_text
-    )
 
 
 if __name__ == '__main__':
